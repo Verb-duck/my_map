@@ -71,7 +71,7 @@ private:
 			this->cell_right = cell_right;
 		}
 	};
-	Cell<Key, Value>* cell_head = nullptr;	//указатель на вершину/первый элемент
+	Cell<Key, Value>* cell_head = nullptr;	//указатель на первый элемент
 	size_t lenght = 0;
 };
 
@@ -107,7 +107,7 @@ const Value& my_map<Key, Value>::get(const Key& key) const
 				continue;
 			}
 			else								//еслли свобободно, совпадений не найдено
-			{									//бросаем исключение, лучше конечно возвращать bool
+			{									//бросаем исключение
 				throw Output_exception<Key>(key);
 			}
 		}
@@ -119,7 +119,7 @@ const Value& my_map<Key, Value>::get(const Key& key) const
 				continue;
 			}
 			else								 //еслли свобободно, совпадений не найдено
-			{									 //бросаем исключение, лучше конечно возвращать bool
+			{									 //бросаем исключение
 				throw Output_exception<Key>(key);
 			}
 		}
@@ -129,7 +129,38 @@ const Value& my_map<Key, Value>::get(const Key& key) const
 template<class Key, class Value>
 bool my_map<Key, Value>::is_set(const Key& key) const
 {
-	return false;
+	Cell<Key, Value>* cell_now = cell_head;
+	while (1)									//ищем совпадение
+	{
+		if (key == cell_now->key)
+		{
+			return true;
+		}
+		else if (key < cell_now->key)			//идём влево
+		{
+			if (cell_now->cell_left != nullptr)	//если занято
+			{
+				cell_now = cell_now->cell_left;	//идём на новую итерацую
+				continue;
+			}
+			else								//еслли свобободно, совпадений не найдено
+			{									
+				return false;
+			}
+		}
+		else									 //идём вправо
+		{
+			if (cell_now->cell_right != nullptr) //если занято
+			{
+				cell_now = cell_now->cell_right; //идём на новую итерацую
+				continue;
+			}
+			else								 //еслли свобободно, совпадений не найдено
+			{									  
+				return false;
+			}
+		}
+	}
 }
 
 template<class Key, class Value>
@@ -309,10 +340,17 @@ void my_map<Key, Value>::print()
 
 
 int main() {
+	try {
 	my_map<int, std::string> map;
 	map.set(8, "3");
 	map.set(1, "5");
 	map.set(3, "7");
+	map.erase(3);
 	map.print();
+	}
+	catch (Output_exception<int> & out)
+	{
+		std::cout << out.what();
+	}
 }
 
